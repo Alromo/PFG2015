@@ -174,7 +174,7 @@ namespace Proto3
             if (Keyboard.GetState().IsKeyDown(Keys.Up) && !pState.IsKeyDown(Keys.Up) && (collisionChecker[0] == false || collisionChecker[1] == false) && (StatusJump==false))
             {
                 _startingJumpingPosition = _position.Y;
-                _accel.Y=_accel.Y-6f;
+                _accel.Y=_accel.Y-3.2f;
             }
             #endregion
 
@@ -230,7 +230,7 @@ namespace Proto3
             if ((_startingJumpingPosition - _position.Y) > _heightJump )
             {  
                 _accel.Y = 1f;
-                _speed.Y = 0;
+                //_speed.Y = 0;
             }
             if( collisionChecker[0] == true || collisionChecker[1] == true)
             {
