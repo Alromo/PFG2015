@@ -35,13 +35,16 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Camera2d.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Individual.cs" />
+    <Compile Include="Level.cs" />
     <Compile Include="MainCharacter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tile.cs" />
     <Compile Include="Tile1.cs" />
+    <Compile Include="Tile0.cs" />
     <Compile Include="Tile2.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -17,12 +17,11 @@ namespace Proto3
     public class Game1 : Game
     {
         GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-        List<Tile> tileList;
-        List<Individual> individualList;
-        int xTiles;
-        int yTiles;
+        SpriteBatch spriteBatch;        
         KeyboardState pState=Keyboard.GetState();
+        Camera2d cam = new Camera2d();
+        Level actualLevel;
+       // Boolean FUNFLAG = true; ///////////////////////////////////////////////////////////
         
 
         public Game1(): base()
@@ -43,11 +42,10 @@ namespace Proto3
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-            tileList = new List<Tile>();
-            individualList = new List<Individual>();
-            xTiles = 0;
-            yTiles = 0;
+            // TODO: Add your initialization logic here            
+            cam.Pos = new Vector2(500.0f, 200.0f);
+            actualLevel = new Level("lvl.txt", Content);
+
             base.Initialize();
         }
 
@@ -59,7 +57,7 @@ namespace Proto3
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            levelRead("lvl.txt");
+            actualLevel.charge();
         }
 
         /// <summary>
@@ -69,6 +67,7 @@ namespace Proto3
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+            actualLevel = new Level("lvl.txt", Content);
         }
 
         /// <summary>
@@ -80,14 +79,50 @@ namespace Proto3
         {
             KeyboardState keyboardState = Keyboard.GetState();
            
-            foreach (Tile t in tileList)
+            foreach (Tile t in actualLevel.tileList)
             {
                 t.Update(gameTime);
             }
-
-            foreach (Individual i in individualList)
+            
+            foreach (Individual i in actualLevel.individualList)
             {
-                pState=i.Update(gameTime, tileList, xTiles, 0.4f, pState);
+                pState = i.Update(gameTime, actualLevel.tileList, actualLevel.xTiles, actualLevel.yTiles, 0.4f, pState, Window);
+                if(i.isMC==true){
+                    cam.Update(i.Position, 0f, 0f, GraphicsDevice.Viewport, actualLevel.xTiles, actualLevel.yTiles, 75, 75);
+                }
+            }
+            
+           // if (Keyboard.GetState().IsKeyDown(Keys.R))
+            //{
+             //  cam.Rotation += 0.1f;
+
+            //}
+           
+          /*
+
+            if (cam.Zoom > 2)
+            {
+                FUNFLAG = false;
+            }
+            if (cam.Zoom == 1)
+            {
+                FUNFLAG = true;
+            }
+            if (FUNFLAG==true)
+            {
+                cam.Zoom += 0.1f;
+
+            }
+            else
+            {
+                cam.Zoom -= 0.1f;
+            }*/
+            
+
+            if (keyboardState.IsKeyDown(Keys.T))
+            {
+                UnloadContent();
+                LoadContent();
             }
 
             if (keyboardState.IsKeyDown(Keys.Escape))
@@ -105,22 +140,31 @@ namespace Proto3
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Transparent);
-            
-            foreach (Tile t in tileList)
+            spriteBatch.Begin(SpriteSortMode.BackToFront,
+                        BlendState.AlphaBlend,
+                        null,
+                        null,
+                        null,
+                        null,
+                        cam.get_transformation(GraphicsDevice));
+
+            foreach (Tile t in actualLevel.tileList)
             {
                 t.Draw(gameTime, spriteBatch);
             }
 
-            foreach (Individual i in individualList)
+            foreach (Individual i in actualLevel.individualList)
             {
-                i.Draw(gameTime, spriteBatch);
+                i.Draw(gameTime, spriteBatch, Content);
             }
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+            spriteBatch.End();
+
         }
 
-        protected void levelRead(string levelName)
+  /*      protected void levelRead(string levelName)
         {
             string line;
             int countY = 0;
@@ -152,9 +196,9 @@ namespace Proto3
                 }
                 countY = countY + 75;
             }
-            xTiles = 14;
-            yTiles = 10;
+            xTiles = 16;
+            yTiles = 14;
             file.Close();
-        }
+        }*/
     }
 }

@@ -20,6 +20,7 @@ namespace Proto3
         protected Vector2 _speed;
         protected Rectangle _collideRectangle;
         protected int _tileType;
+        protected int _damageDealt;
         #endregion
 
         #region Properties Region
@@ -57,6 +58,12 @@ namespace Proto3
             get { return _tileType; }
             protected set { _tileType = value; }
         }
+
+        public int DamageDealt
+        {
+            get { return _damageDealt; }
+            set { _damageDealt = value; }
+        }
         #endregion
 
 
@@ -69,6 +76,7 @@ namespace Proto3
             _frameSize = new Point(25, 25);
             CollideRectangle = new Rectangle((int)_position.X, (int)_position.Y, _frameSize.X, _frameSize.Y);
             TileType = -1;
+            DamageDealt = 0;
         }
 
         public Tile(Texture2D textureImage, Vector2 position, Point frameSize, Vector2 speed)
@@ -91,9 +99,7 @@ namespace Proto3
 
         public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin();
             spriteBatch.Draw(TextureImage, Position, Color.White);
-            spriteBatch.End();
         }
 
         public virtual Boolean Collide(Tile another)

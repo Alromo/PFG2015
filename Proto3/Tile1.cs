@@ -20,7 +20,7 @@ namespace Proto3
             _frameSize = frameSize;
             CollideRectangle = new Rectangle((int)position.X, (int)position.Y, frameSize.X, frameSize.Y);
             Speed = speed;
-            TileType = 1;
+            TileType = 1;           
         }
        
     }

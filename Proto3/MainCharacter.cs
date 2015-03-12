@@ -45,6 +45,7 @@ namespace Proto3
             get { return _pPosition; }
             protected set { _pPosition = value; }
         }
+        
         #endregion
 
         #region Builder Region
@@ -63,6 +64,9 @@ namespace Proto3
             Speed = new Vector2(0, 0);
             StartingJumpingPosition = Position.Y;
             _initialD = position;
+            _isMC = true;
+            HealthPoints = 50;
+            
         }
         #endregion 
 
@@ -95,11 +99,25 @@ namespace Proto3
             return list;
         }
 
-        public override KeyboardState Update(GameTime gameTime, List<Tile> tileList, int numberOfXTiles, float gravity, KeyboardState pState)
+        public override KeyboardState Update(GameTime gameTime, List<Tile> tileList, int numberOfXTiles, int numberOfYTiles, float gravity, KeyboardState pState, GameWindow window)
         {
+            if (Position.X > (numberOfXTiles * 75) - FrameSize.X)
+                _position.X = (numberOfXTiles * 75) - FrameSize.X;
+            if (Position.Y >  (numberOfYTiles*75) - FrameSize.Y)
+                _position.Y = (numberOfYTiles * 75) - FrameSize.Y -50;
+
+            if (Position.X < 0)
+                _position.X = 0;
+            if (Position.Y < 0)
+                _position.Y = 0; 
             //this.collideRectangle.X = (int)position.X;
             //this.collideRectangle.Y = (int)position.Y;
-             
+            if (HealthPoints <= 0)
+            {
+                HealthPoints = 50;
+                _position.X = 75;
+                _position.Y = 225;
+            }
             _pPosition=_position;
             
             List<bool> collisionChecker = collisionDetection(tileList, numberOfXTiles);
@@ -125,6 +143,11 @@ namespace Proto3
             if (_speed.Y < -15f)
             {
                 _speed.Y = -15f;
+            }
+
+            if (_speed.Y > 15f)
+            {
+                _speed.Y = 15f;
             }
             #endregion
 
@@ -211,9 +234,10 @@ namespace Proto3
                 _accel.X = _accel.X + 1f;
             }
             #endregion
-
         
             collisionChecker = collisionDetection(tileList, numberOfXTiles);
+
+
 
             #region Behavior at landing
             if (collisionChecker[4] == true || collisionChecker[5] == true) 
@@ -240,14 +264,14 @@ namespace Proto3
             }
             #endregion
 
-            #region One-push Jumping detector
-            if (Keyboard.GetState().GetPressedKeys().Count() == 0)
+            #region One-push detector
+            if (Keyboard.GetState().IsKeyUp(Keys.Left)&&Keyboard.GetState().IsKeyUp(Keys.Right))
             {
                 _speed.X = 0;
                 _accel.X = 0;
             }
             #endregion
-
+           
 
             return Keyboard.GetState();
             
@@ -282,15 +306,22 @@ namespace Proto3
                 {
                     collisionPointList.Add(false);
                 }
+                if (actualtype == 2)
+                {
+                    collisionPointList.Add(true);
+                    _accel.Y -= t.DamageDealt;
+                }
             }
             return collisionPointList;
         }
 
-        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch, ContentManager content)
         {
-            spriteBatch.Begin();
+            if (HealthPoints <= 0)
+            {
+                _textureImage = content.Load<Texture2D>(@"images\fire");
+            }
             spriteBatch.Draw(_textureImage, _position, Color.White);
-            spriteBatch.End();
         }
 
 

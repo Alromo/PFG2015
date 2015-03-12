@@ -23,6 +23,9 @@ namespace Proto3
         protected Rectangle _collideRectangle;
         protected List<Point> _collidePoint;
         protected Vector2 _accel;
+        protected Boolean _isMC;
+        protected int _healthPoints;
+
         #endregion
 
         #region Properties Region
@@ -69,6 +72,15 @@ namespace Proto3
             get { return _accel; }
             protected set { _accel = value; }
         }
+        public Boolean isMC
+        {
+            get { return _isMC; }
+        }
+        public int HealthPoints
+        {
+            get { return _healthPoints; }
+            set { _healthPoints = value; }
+        }
         #endregion
 
         #region Builder Region
@@ -94,12 +106,13 @@ namespace Proto3
             CollideRectangle = new Rectangle((int)_position.X, (int)_position.Y, _frameSize.X, _frameSize.Y);
             _collidePoint = cPointSelect();
             Accel = new Vector2(0, 0);
+            _isMC = false;
 
         }
         #endregion
 
         #region Methods Region
-        public virtual KeyboardState Update(GameTime gameTime, List<Tile> tileList, int numberOfXTiles, float gravity, KeyboardState pState)
+        public virtual KeyboardState Update(GameTime gameTime, List<Tile> tileList, int numberOfXTiles, int numberOfYTiles, float gravity, KeyboardState pState, GameWindow window)
         {
             Rectangle auxRectangle = new Rectangle((int)Position.X, (int)Position.Y, CollideRectangle.Width, CollideRectangle.Height);
             CollideRectangle = auxRectangle;
@@ -107,13 +120,11 @@ namespace Proto3
         }
 
 
-        public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch, ContentManager content)
         {
-            spriteBatch.Begin();
             
             spriteBatch.Draw(_textureImage, Position, Color.White);
    
-            spriteBatch.End();
         }
 
         protected virtual List<Point> cPointSelect()
