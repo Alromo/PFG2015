@@ -20,7 +20,7 @@ namespace Proto3
         protected Vector2 _speed;
         protected Rectangle _collideRectangle;
         protected int _tileType;
-        protected int _damageDealt;
+        protected float _damageDealt;
         #endregion
 
         #region Properties Region
@@ -59,7 +59,7 @@ namespace Proto3
             protected set { _tileType = value; }
         }
 
-        public int DamageDealt
+        public float DamageDealt
         {
             get { return _damageDealt; }
             set { _damageDealt = value; }

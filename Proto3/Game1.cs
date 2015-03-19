@@ -21,7 +21,9 @@ namespace Proto3
         KeyboardState pState=Keyboard.GetState();
         Camera2d cam = new Camera2d();
         Level actualLevel;
-       // Boolean FUNFLAG = true; ///////////////////////////////////////////////////////////
+        SpriteFont hudFont;
+        int gameState;
+       //Boolean FUNFLAG = true; ///////////////////////////////////////////////////////////
         
 
         public Game1(): base()
@@ -44,8 +46,8 @@ namespace Proto3
         {
             // TODO: Add your initialization logic here            
             cam.Pos = new Vector2(500.0f, 200.0f);
-            actualLevel = new Level("lvl.txt", Content);
-
+            gameState = 0;
+            
             base.Initialize();
         }
 
@@ -57,6 +59,17 @@ namespace Proto3
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            switch (gameState)
+            {
+                case 1:
+                    actualLevel = new Level("lvl.txt", Content, 0);
+                    break;
+                default:
+                    actualLevel = new Level("lvl.txt", Content, 0);
+                    break;
+
+            }
+            hudFont = Content.Load<SpriteFont>("Fuente");
             actualLevel.charge();
         }
 
@@ -67,7 +80,7 @@ namespace Proto3
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
-            actualLevel = new Level("lvl.txt", Content);
+            actualLevel = new Level("lvl.txt", Content,0);
         }
 
         /// <summary>
@@ -78,28 +91,31 @@ namespace Proto3
         protected override void Update(GameTime gameTime)
         {
             KeyboardState keyboardState = Keyboard.GetState();
-           
-            foreach (Tile t in actualLevel.tileList)
+            gameState = actualLevel.LevelNum;
+            foreach (Tile t in actualLevel._tileList)
             {
                 t.Update(gameTime);
             }
             
-            foreach (Individual i in actualLevel.individualList)
+            foreach (Individual i in actualLevel._individualList)
             {
-                pState = i.Update(gameTime, actualLevel.tileList, actualLevel.xTiles, actualLevel.yTiles, 0.4f, pState, Window);
+                pState = i.Update(gameTime, actualLevel._tileList, actualLevel._xTiles, actualLevel._yTiles, 0.4f, pState, Window);
                 if(i.isMC==true){
-                    cam.Update(i.Position, 0f, 0f, GraphicsDevice.Viewport, actualLevel.xTiles, actualLevel.yTiles, 75, 75);
+                    cam.Update(i.Position, 0f, 0f, GraphicsDevice.Viewport, actualLevel._xTiles, actualLevel._yTiles, 75, 75);
                 }
             }
             
            // if (Keyboard.GetState().IsKeyDown(Keys.R))
             //{
-             //  cam.Rotation += 0.1f;
-
+           
+            
+            //if(cam.Rotation<Math.PI-0.007)
+             //  cam.Rotation += 0.01f;
+            
             //}
            
-          /*
-
+          
+            /*
             if (cam.Zoom > 2)
             {
                 FUNFLAG = false;
@@ -117,7 +133,7 @@ namespace Proto3
             {
                 cam.Zoom -= 0.1f;
             }*/
-            
+           
 
             if (keyboardState.IsKeyDown(Keys.T))
             {
@@ -140,24 +156,34 @@ namespace Proto3
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Transparent);
-            spriteBatch.Begin(SpriteSortMode.BackToFront,
+            MainCharacter MC=null;
+            spriteBatch.Begin(SpriteSortMode.Immediate,
                         BlendState.AlphaBlend,
                         null,
                         null,
                         null,
                         null,
                         cam.get_transformation(GraphicsDevice));
-
-            foreach (Tile t in actualLevel.tileList)
+            foreach (Tile t in actualLevel._tileList)
             {
                 t.Draw(gameTime, spriteBatch);
             }
 
-            foreach (Individual i in actualLevel.individualList)
+            foreach (Individual i in actualLevel._individualList)
             {
+                if (i.isMC){
+                    MC = (MainCharacter)i;
+                }
                 i.Draw(gameTime, spriteBatch, Content);
             }
             // TODO: Add your drawing code here
+            Vector2 fontPosLeft1 = new Vector2(cam.Pos.X - GraphicsDevice.Viewport.Width/2 +50, cam.Pos.Y - GraphicsDevice.Viewport.Height/2+50);
+            Vector2 fontPosRight1 = new Vector2(cam.Pos.X + GraphicsDevice.Viewport.Width / 4 , cam.Pos.Y - GraphicsDevice.Viewport.Height / 2 + 50);
+
+            spriteBatch.DrawString(hudFont, "Vida: "+Math.Round(MC.HealthPoints,0).ToString(), fontPosLeft1, Color.White);
+            spriteBatch.DrawString(hudFont, "Vidas: " + MC.Lifes.ToString(), fontPosRight1, Color.White);
+
+
 
             base.Draw(gameTime);
             spriteBatch.End();

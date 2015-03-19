@@ -19,6 +19,7 @@ namespace Proto3
         private float _startingJumpingPosition;
         private Vector2 _pPosition;
         private Vector2 _initialD;
+        private int _lifes;
         #endregion
 
         #region Properties Region
@@ -45,7 +46,12 @@ namespace Proto3
             get { return _pPosition; }
             protected set { _pPosition = value; }
         }
-        
+
+        public int Lifes
+        {
+            get { return _lifes; }
+            protected set { _lifes = value; }
+        }
         #endregion
 
         #region Builder Region
@@ -57,7 +63,7 @@ namespace Proto3
             XDirection=true;
             CollideRectangle = new Rectangle((int)position.X, (int)position.Y, frameSize.X, frameSize.Y);
             _collidePoint = cPointSelect();
-            StatusJump = false;
+            StatusJump = true;
             HeightJump = 90;
             PPosition = Position;
             Accel=new Vector2(0,0);
@@ -65,7 +71,8 @@ namespace Proto3
             StartingJumpingPosition = Position.Y;
             _initialD = position;
             _isMC = true;
-            HealthPoints = 50;
+            HealthPoints = 50f;
+            Lifes = 5;
             
         }
         #endregion 
@@ -75,10 +82,10 @@ namespace Proto3
         {
             List<Point> list = new List<Point>();
 
-            Point pointU1 = new Point(3, 0);
+            Point pointU1 = new Point(3, 3);
             list.Add(pointU1);
 
-            Point pointU2 = new Point(72, 0);
+            Point pointU2 = new Point(72, 3);
             list.Add(pointU2);
 
             Point pointL1 = new Point(1, 74);
@@ -92,6 +99,18 @@ namespace Proto3
 
             Point pointD2 = new Point(70, 75);
             list.Add(pointD2);
+
+            Point pointL2 = new Point(1, 3);
+            list.Add(pointL2);
+
+            Point pointR2 = new Point(74, 3);
+            list.Add(pointR2);
+
+            Point pointL3 = new Point(1, 37);
+            list.Add(pointL3);
+
+            Point pointR3 = new Point(74, 37);
+            list.Add(pointR3);
 
 
             
@@ -115,8 +134,10 @@ namespace Proto3
             if (HealthPoints <= 0)
             {
                 HealthPoints = 50;
-                _position.X = 75;
-                _position.Y = 225;
+                Lifes--;
+               
+                //_position.X = 75;
+                //_position.Y = 225;
             }
             _pPosition=_position;
             
@@ -124,6 +145,7 @@ namespace Proto3
             _speed.X = _speed.X + _accel.X;
             _speed.Y = _speed.Y + _accel.Y;
             _accel.Y = _accel.Y + gravity;
+            _clip = false;
 
             #region Speed/Accel Limiter Region
             if (_speed.X > 7f)
@@ -152,14 +174,32 @@ namespace Proto3
             #endregion
 
             #region Collision Limiter Region
-            if (collisionChecker[2] == true && _speed.X < 0)
+            if ((collisionChecker[2] == true || collisionChecker[6] == true || collisionChecker[8] == true) && _speed.X < 0)
             {
                 _speed.X = 0;
+               
             }
-            if (collisionChecker[3] == true && _speed.X > 0)
+            if ((collisionChecker[3] == true || collisionChecker[7] == true || collisionChecker[9] == true) && _speed.X > 0)
             {
                 _speed.X = 0;
+
             }
+            if ((collisionChecker[2] == true || collisionChecker[6] == true || collisionChecker[8] == true) && _statusJump == true)
+            {
+                _position.X += 0.5f;
+                _speed.X = 0.5f;
+               
+            }
+            if ((collisionChecker[3] == true || collisionChecker[7] == true || collisionChecker[9] == true) && _statusJump==true)
+            {
+                _position.X -= 0.5f;
+                _speed.X = -0.5f;
+                
+
+            }
+
+
+
             if ((collisionChecker[0] == true || collisionChecker[1] == true) && _speed.Y < 0)
             {
                 _speed.Y = 0;
@@ -174,22 +214,53 @@ namespace Proto3
             _position += _speed;
             #endregion
 
-            #region Gravity and collision-at-falling repositioning Region 
-            if (collisionChecker[4] == false || collisionChecker[5] == false && _statusJump ==false)
+          /*  
+            if (collisionChecker[3] == true || collisionChecker[7] == true || collisionChecker[9] == true)
+            {
+                Tile auxTile = tileList[tileDetection(tileList, numberOfXTiles, 75, _collidePoint[3].Y)];
+                Tile auxTile2 = tileList[tileDetection(tileList, numberOfXTiles, 75, _collidePoint[7].Y)];
+                Tile auxTile3  = tileList[tileDetection(tileList, numberOfXTiles, 75, _collidePoint[9].Y)];
+
+
+                if (auxTile.TileType == 1 || auxTile2.TileType == 1 || auxTile2.TileType == 1)
+                {
+                    _position.X = auxTile.Position.X - 75-3;
+                }
+
+            }
+            */
+
+
+            #region Gravity and collision-at-falling repositioning Region
+            if ((collisionChecker[4] == false && collisionChecker[5] == true) || (collisionChecker[4] == true && collisionChecker[5] == false) || (collisionChecker[4] == false && collisionChecker[5] == false))
             {
                 Tile auxTile=tileList[tileDetection(tileList, numberOfXTiles, _collidePoint[4].X, 75+gravity)];
                 Tile auxTile2 = tileList[tileDetection(tileList, numberOfXTiles, _collidePoint[5].X, 75 + gravity)];
 
-                if (auxTile.TileType==1 || auxTile2.TileType==1)
+
+                if (collisionChecker[4] == false && collisionChecker[5] == false)
+                {
+                    _position.Y = _position.Y + gravity;
+
+                }
+                else if (auxTile.TileType==1 || auxTile2.TileType==1)
                 {
                     _position.Y = auxTile.Position.Y-75;
                 }
-                
-                else if (collisionChecker[4] == false && collisionChecker[5] == false)
+       
+            }
+
+            if ((collisionChecker[4] == true || collisionChecker[5] == true))
+            {
+                Tile auxTile = tileList[tileDetection(tileList, numberOfXTiles, _collidePoint[4].X, 75 + gravity)];
+                Tile auxTile2 = tileList[tileDetection(tileList, numberOfXTiles, _collidePoint[5].X, 75 + gravity)];
+                if (auxTile.TileType == 1 || auxTile2.TileType == 1)
                 {
-                    _position.Y = _position.Y + gravity;
+                    _position.Y = auxTile.Position.Y - 75;
                 }
             }
+
+
             #endregion
 
 
@@ -202,7 +273,7 @@ namespace Proto3
             #endregion
 
             #region Left and right movement Region
-            if (Keyboard.GetState().IsKeyDown(Keys.Left) && collisionChecker[2]==false)
+            if (Keyboard.GetState().IsKeyDown(Keys.Left) && collisionChecker[2] == false && collisionChecker[6]==false && collisionChecker[8]==false)
             {
                 _xDirection = false;
                 _accel.X = _accel.X - 3f;
@@ -212,7 +283,7 @@ namespace Proto3
                 }
 
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.Right) && collisionChecker[3] == false)
+            if (Keyboard.GetState().IsKeyDown(Keys.Right) && collisionChecker[3] == false && collisionChecker[7] == false && collisionChecker[9] == false)
             {
                 _xDirection = true;                
                 _accel.X=_accel.X + 3f;
@@ -238,17 +309,17 @@ namespace Proto3
             collisionChecker = collisionDetection(tileList, numberOfXTiles);
 
 
-
             #region Behavior at landing
-            if (collisionChecker[4] == true || collisionChecker[5] == true) 
+            if (collisionChecker[4] == true || collisionChecker[5] == true)
             {
-                StatusJump = false ;                               
+                StatusJump = false;
             }
             if (collisionChecker[4] == false && collisionChecker[5] == false)
             {
                 StatusJump = true;
             }
             #endregion
+            
 
             #region Jumping Limiter
             if ((_startingJumpingPosition - _position.Y) > _heightJump )
@@ -256,7 +327,7 @@ namespace Proto3
                 _accel.Y = 1f;
                 //_speed.Y = 0;
             }
-            if( collisionChecker[0] == true || collisionChecker[1] == true)
+            if( (collisionChecker[0] == true || collisionChecker[1] == true) && (collisionChecker[4]==false && collisionChecker[5]==false))
             {
                 _position.Y = _position.Y +1;
                 _speed.Y = 0;
@@ -286,13 +357,23 @@ namespace Proto3
 
             nearTilesList.Add(tileList[tileDetection(tileList, xTiles, _collidePoint[1].X-2, _collidePoint[1].Y)]);
 
-            nearTilesList.Add(tileList[tileDetection(tileList, xTiles, _collidePoint[2].X - 1, _collidePoint[2].Y)]);
+            nearTilesList.Add(tileList[tileDetection(tileList, xTiles, _collidePoint[2].X - 4, _collidePoint[2].Y)]);
 
-            nearTilesList.Add(tileList[tileDetection(tileList, xTiles, _collidePoint[3].X +2, _collidePoint[3].Y)]);
+            nearTilesList.Add(tileList[tileDetection(tileList, xTiles, _collidePoint[3].X +4, _collidePoint[3].Y)]);
 
-            nearTilesList.Add(tileList[tileDetection(tileList, xTiles, _collidePoint[4].X+2, _collidePoint[4].Y + 1)]);
+            nearTilesList.Add(tileList[tileDetection(tileList, xTiles, _collidePoint[4].X+2, _collidePoint[4].Y + 3)]);
 
-            nearTilesList.Add(tileList[tileDetection(tileList, xTiles, _collidePoint[5].X-2, _collidePoint[5].Y + 1)]);
+            nearTilesList.Add(tileList[tileDetection(tileList, xTiles, _collidePoint[5].X-2, _collidePoint[5].Y + 3)]);
+
+            nearTilesList.Add(tileList[tileDetection(tileList, xTiles, _collidePoint[6].X-4, _collidePoint[6].Y)]);
+
+            nearTilesList.Add(tileList[tileDetection(tileList, xTiles, _collidePoint[7].X + 4, _collidePoint[7].Y)]);
+
+            nearTilesList.Add(tileList[tileDetection(tileList, xTiles, _collidePoint[8].X - 4, _collidePoint[8].Y)]);
+
+            nearTilesList.Add(tileList[tileDetection(tileList, xTiles, _collidePoint[9].X + 4, _collidePoint[9].Y)]);
+
+
 
             foreach (Tile t in nearTilesList)
             {
@@ -309,7 +390,7 @@ namespace Proto3
                 if (actualtype == 2)
                 {
                     collisionPointList.Add(true);
-                    _accel.Y -= t.DamageDealt;
+                    HealthPoints -= t.DamageDealt/8;
                 }
             }
             return collisionPointList;
@@ -320,8 +401,10 @@ namespace Proto3
             if (HealthPoints <= 0)
             {
                 _textureImage = content.Load<Texture2D>(@"images\fire");
+
             }
-            spriteBatch.Draw(_textureImage, _position, Color.White);
+
+            spriteBatch.Draw(_textureImage, Position, Color.White);
         }
 
 

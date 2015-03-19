@@ -24,7 +24,8 @@ namespace Proto3
         protected List<Point> _collidePoint;
         protected Vector2 _accel;
         protected Boolean _isMC;
-        protected int _healthPoints;
+        protected float _healthPoints;
+        protected Boolean _clip;
 
         #endregion
 
@@ -76,7 +77,7 @@ namespace Proto3
         {
             get { return _isMC; }
         }
-        public int HealthPoints
+        public float HealthPoints
         {
             get { return _healthPoints; }
             set { _healthPoints = value; }

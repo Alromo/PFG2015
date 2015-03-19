@@ -20,7 +20,7 @@ namespace Proto3
 
         public Camera2d()
         {
-            _zoom = 0.5f;
+            _zoom = 1f;
             _rotation = 0.0f;
             _pos = Vector2.Zero;
         }
@@ -67,23 +67,31 @@ namespace Proto3
             Zoom += zoom;
             Rotation += rot;
 
-            if (pos.X - (viewPort.Width / 2) < 0)
+            if (pos.X - (viewPort.Width / 2) -75 < 0)
             {
-                pos.X = viewPort.Width / 2;
+                pos.X = viewPort.Width / 2 +75;
             }
-            if (pos.X + (viewPort.Width / 2) > (xTiles*xTileSize))
+            if (pos.X + (viewPort.Width / 2) +75 > (xTiles*xTileSize))
             {
                 pos.X = Pos.X;
             }
-            if (pos.Y - (viewPort.Height / 2) < 0)
+            if (pos.Y - (viewPort.Height / 2) -75 < 0)
             {
-                pos.Y = viewPort.Height / 2;
+                pos.Y = viewPort.Height / 2 +75;
             }
             if (pos.Y + (viewPort.Height / 2) +75 > (yTiles * yTileSize))
             {
                 pos.Y = Pos.Y;
             }
-            Pos = pos;
+            if (Math.Abs(Pos.X - pos.X) > 2)
+            {
+                _pos.X = pos.X;
+            }
+            if (Math.Abs(Pos.Y - pos.Y) > 2)
+            {
+                _pos.Y = pos.Y;
+            }
+            pos = Pos;
 
         }
         #endregion
